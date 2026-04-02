@@ -1,0 +1,1236 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiz LIMITLESSE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          #f5ede0;
+      --surface:     #fdf8f2;
+      --surface-2:   #f7ede0;
+      --surface-3:   #f0e3d0;
+      --text:        #2c1f0e;
+      --muted:       #7a6248;
+      --faint:       #b89c7e;
+      --line:        #e0ccb4;
+      --line-hover:  #c8a882;
+      /* Laranja principal */
+      --brand:       #d4622a;
+      --brand-h:     #e0784a;
+      --brand-fg:    #fff8f3;
+      /* Sage, acento secundário */
+      --sage:        #5a7a58;
+      /* Fases */
+      --ph-a:        #c4501e;
+      --ph-b:        #2e6e82;
+      --ph-c:        #8a6a10;
+      --ph-d:        #2e6040;
+      --r: 16px;
+      --r-sm: 11px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 60px;
+    }
+
+    /* ── Logo marca ── */
+    .brand-logo {
+      display: block;
+      margin-bottom: 22px;
+      line-height: 0;
+    }
+    .brand-logo img {
+      height: clamp(28px, 6vw, 40px);
+      width: auto;
+      display: block;
+    }
+
+    /* ── Shell ── */
+    .shell { width: min(660px, 100%); }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: clamp(24px, 6vw, 48px);
+      box-shadow: 0 8px 40px rgba(120,70,20,.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(212,98,42,.25), transparent);
+    }
+
+    /* ── Progress ── */
+    .prog-track {
+      height: 2px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .prog-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--brand), var(--brand-h));
+      transition: width .45s cubic-bezier(.4,0,.2,1);
+    }
+    .prog-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: .78rem;
+      color: var(--faint);
+      margin-bottom: 32px;
+    }
+
+    /* ── Transição de ecrã ── */
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .screen { animation: rise .3s ease both; }
+
+    /* ── Intro ── */
+    .eyebrow {
+      display: block;
+      font-size: .72rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--brand);
+      margin-bottom: 16px;
+    }
+    .intro-h {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      font-weight: 600;
+      line-height: 1.18;
+      margin-bottom: 20px;
+    }
+    .intro-h em { font-style: italic; color: var(--brand-h); }
+    .intro-value {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+    .intro-p {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: .96rem;
+      margin-bottom: 28px;
+    }
+    .bullets { display: grid; gap: 11px; margin-bottom: 36px; }
+    .bullet {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: .91rem;
+      color: var(--muted);
+    }
+    .bullet-dot {
+      color: var(--sage);
+      font-size: .7rem;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    /* ── Pergunta ── */
+    .q-h {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(1.15rem, 2.8vw, 1.5rem);
+      font-weight: 600;
+      line-height: 1.35;
+      margin-bottom: 24px;
+    }
+    .q-hint {
+      font-size: .86rem;
+      color: var(--muted);
+      margin-top: -12px;
+      margin-bottom: 20px;
+      line-height: 1.45;
+    }
+    .opts { display: grid; gap: 10px; margin-bottom: 26px; }
+    .opt {
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      border-radius: var(--r-sm);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      user-select: none;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: .92rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .opt:hover {
+      border-color: var(--line-hover);
+      background: var(--surface-3);
+    }
+    .opt.sel {
+      border-color: var(--brand);
+      background: #fce8da;
+      box-shadow: 0 0 0 1px var(--brand);
+    }
+    .opt-k {
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--faint);
+      margin-top: 3px;
+      min-width: 1.1rem;
+      width: auto;
+      flex-shrink: 0;
+    }
+    .opt.sel .opt-k { color: var(--brand); }
+
+    /* ── Botões ── */
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      border: none;
+      border-radius: var(--r-sm);
+      padding: 12px 22px;
+      font-family: "DM Sans", sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter .12s, transform .12s, opacity .12s;
+    }
+    .btn-p {
+      background: var(--brand);
+      color: var(--brand-fg);
+    }
+    .btn-p:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-p:disabled { opacity: .38; cursor: not-allowed; }
+    .btn-g {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+    .btn-g:hover:not(:disabled) { border-color: var(--line-hover); color: var(--text); }
+    .btn-g:disabled { opacity: .35; cursor: not-allowed; }
+
+    /* ── Segmentação ── */
+    .seg-q {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(1.35rem, 3.2vw, 1.75rem);
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .seg-opts { display: grid; gap: 12px; margin-bottom: 8px; }
+    .seg-opt {
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      border-radius: var(--r-sm);
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      font-family: "DM Sans", sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      line-height: 1.45;
+    }
+    .seg-opt:hover {
+      border-color: var(--brand);
+      background: #fce8da;
+    }
+    .seg-opt:focus { outline: 2px solid var(--brand); outline-offset: 2px; }
+    .seg-opt-sub {
+      display: block;
+      font-weight: 400;
+      font-size: .86rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ── A calcular ── */
+    .calc {
+      text-align: center;
+      padding: 40px 0 24px;
+    }
+    .spin {
+      width: 40px; height: 40px;
+      border: 2px solid var(--line);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: rotate .85s linear infinite;
+      margin: 0 auto 24px;
+    }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+    .calc-h {
+      font-family: "Playfair Display", serif;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+    .calc-s { color: var(--muted); font-size: .9rem; }
+
+    /* ── Resultado ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 28px 0;
+    }
+    .phase-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 13px;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .res-h {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+      line-height: 1.25;
+      margin-bottom: 14px;
+    }
+    .res-body {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: .94rem;
+      margin-bottom: 0;
+    }
+    .section-label {
+      display: block;
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 14px;
+    }
+    .event-cards { display: grid; gap: 11px; }
+    .ev-card {
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      border-radius: var(--r-sm);
+      padding: 15px 18px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .15s, background .15s;
+      cursor: pointer;
+    }
+    .ev-card:hover {
+      border-color: var(--line-hover);
+      background: var(--surface-3);
+    }
+    .ev-icon { font-size: 1.15rem; margin-top: 1px; flex-shrink: 0; }
+    .ev-title {
+      font-weight: 600;
+      font-size: .93rem;
+      margin-bottom: 4px;
+    }
+    .ev-sub {
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.4;
+    }
+    .ev-arrow {
+      margin-left: auto;
+      color: var(--faint);
+      align-self: center;
+      padding-left: 8px;
+      flex-shrink: 0;
+    }
+    .score-note {
+      font-size: .76rem;
+      color: var(--faint);
+      text-align: center;
+      margin-top: 18px;
+    }
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--faint);
+      font-size: .82rem;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      font-family: "DM Sans", sans-serif;
+      margin-top: 14px;
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+    .btn-link:hover { color: var(--muted); }
+
+    /* ── Email + ranking de soluções ── */
+    .email-lead {
+      color: var(--muted);
+      font-size: .94rem;
+      line-height: 1.65;
+      margin-bottom: 22px;
+    }
+    .rank-list {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .rank-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      font-size: .9rem;
+    }
+    .rank-name { font-weight: 600; color: var(--text); }
+    .rank-pts {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--brand);
+      white-space: nowrap;
+    }
+    .email-field {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      font-family: "DM Sans", sans-serif;
+      font-size: .95rem;
+      margin-bottom: 14px;
+      background: var(--surface);
+    }
+    .email-field:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(212, 98, 42, .2);
+    }
+    .email-hint {
+      font-size: .8rem;
+      color: var(--faint);
+      margin-bottom: 18px;
+    }
+    .free-text-wrap {
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+    .free-text-label {
+      display: block;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .free-text-area {
+      width: 100%;
+      min-height: 96px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      font-family: "DM Sans", sans-serif;
+      font-size: .9rem;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--surface);
+      resize: vertical;
+    }
+    .free-text-area:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(212, 98, 42, .2);
+    }
+    .free-text-area::placeholder {
+      color: var(--faint);
+    }
+  </style>
+</head>
+<body>
+  <a class="brand-logo" href="https://essemood.com/" target="_blank" rel="noopener noreferrer"><img src="logo1.png" alt="ESSE MOOD"></a>
+  <div class="shell">
+    <div class="card">
+      <div class="prog-track"><div class="prog-fill" id="bar"></div></div>
+      <div class="prog-meta">
+        <span id="lbl">Quiz LIMITLESSE</span>
+        <span id="cnt"></span>
+      </div>
+      <div id="screen" class="screen"></div>
+    </div>
+  </div>
+
+  <script>
+    const QsSelf = [
+      {
+        text: "Qual o estado com que te identificas mais agora?",
+        opts: [
+          ["A", "Em modo de sobrevivência. Assoberbado e não sei para onde me virar."],
+          ["B", "Cansado. O meu corpo e a minha mente estão a pedir uma pausa."],
+          ["C", "Estou funcional, mas há hábitos que quero mudar."],
+          ["D", "Estou relativamente estável, mas quero ser mais consistente."]
+        ]
+      },
+      {
+        text: "Como é a tua relação com o tempo no dia a dia?",
+        opts: [
+          ["A", "Nunca chega. Há sempre mais para fazer do que tempo disponível."],
+          ["B", "Tenho tempo, mas nem sempre tenho energia para o aproveitar."],
+          ["C", "Quando tenho tempo, procrastino e acabo por o desperdiçar."],
+          ["D", "Consigo gerir razoavelmente, mas quero mais estrutura e clareza."]
+        ]
+      },
+      {
+        text: "O que sentes que te pesa mais neste momento?",
+        opts: [
+          ["A", "O excesso: tarefas, compromissos, informação, expectativas."],
+          ["B", "O cansaço físico e mental. O descanço nunca é suficiente."],
+          ["C", "Hábitos e pensamentos que me travam a evolução."],
+          ["D", "A falta de consistência. Começo bem, mas não mantenho."]
+        ]
+      },
+      {
+        text: "Como descreves a tua relação com o teu corpo?",
+        opts: [
+          ["A", "Vivo mais na cabeça do que no corpo. Quase não o ouço."],
+          ["B", "Sinto o corpo tenso, pesado ou inflamado."],
+          ["C", "Estou atento aos sinais do meu corpo, mas gostava de o cuidar melhor."],
+          ["D", "Cuido-o bem, mas quero ser mais regular e consistente."]
+        ]
+      },
+      {
+        text: "Como foi o teu o último mês?",
+        opts: [
+          ["A", "Caótico. Não tive espaço nem para pensar em mim."],
+          ["B", "Oscilante. Há dias bons, mas não consigo estabilizar."],
+          ["C", "Razoável: sei que posso mais e quero mudar alguns padrões."],
+          ["D", "Relativamente bom. Quero consolidar e não perder o que já construí."]
+        ]
+      },
+      {
+        text: "Quando pensas em criar hábitos saudáveis, o que acontece?",
+        opts: [
+          ["A", "Sinto-me assoberbado e nem sei por onde começar."],
+          ["B", "Gostava, mas não tenho motivação ou energia para começar."],
+          ["C", "Tento, mas os velhos hábitos acabam sempre por voltar."],
+          ["D", "Crio alguns hábitos, mas perco-os quando a vida complica."]
+        ]
+      },
+      {
+        text: "O que já tentaste para melhorar o teu bem-estar?",
+        opts: [
+          ["A", "Já tentei algumas coisas mas nada de forma consistente ou com grandes resultados."],
+          ["B", "Ginásio ou treino regular."],
+          ["C", "Yoga."],
+          ["D", "Pilates."],
+          ["E", "Outros desportos."],
+          ["F", "Contacto com natureza."],
+          ["G", "Banhos e/ou sauna."],
+          ["H", "Caminhadas."],
+          ["I", "Meditação."],
+          ["J", "Breathwork ou respiração."],
+          ["K", "Escrita ou journaling."],
+          ["L", "Terapias (psicologia, medicinas alternativas, etc.)."],
+          ["M", "Mentorias ou acompanhamento."],
+          ["N", "Workshops ou cursos."],
+          ["O", "Apps, vídeos ou conteúdos online."],
+          ["P", "Podcasts ou livros."],
+          ["Q", "Outros."]
+        ]
+      },
+      {
+        text: "O que sentes que mais precisas agora?",
+        opts: [
+          ["A", "Parar. Simplificar. Ter menos na cabeça."],
+          ["B", "Recuperar. Descansar e regular de uma forma que resulte a sério."],
+          ["C", "Mudar. Criar novos hábitos que perdurem de forma consistente."],
+          ["D", "Manter e estabilizar."]
+        ]
+      },
+      {
+        text: "Qual destas emoções te acompanha mais ultimamente?",
+        opts: [
+          ["A", "Overwhelm: a sensação de que há demasiado e dificuldade em gerir."],
+          ["B", "Exaustão: um cansaço constante que o sono não resolve."],
+          ["C", "Frustração: sei o que preciso, mas não estou a conseguir chegar lá."],
+          ["D", "Inquietação: estou no caminho certo, mas quero evoluir e acelerar."]
+        ]
+      },
+      {
+        text: "O que sentes que é o maior obstáculo entre ti e o teu bem-estar?",
+        opts: [
+          ["A", "O excesso e a sobrecarga de informação: não sei por onde começar nem o que eliminar primeiro."],
+          ["B", "O meu sistema está drenado: não estou em condições de mudar enquanto não recuperar energia."],
+          ["C", "Os meus padrões antigos: sei o que preciso de mudar, mas volto ao mesmo comportamento."],
+          ["D", "A consistência: já mudei coisas, mas funciono em sprints e o desafio é não cair nos padrões antigos a longo prazo."]
+        ]
+      },
+      {
+        text: "Como está a tua relação contigo neste momento?",
+        opts: [
+          ["A", "Desconectada/o. Sinto que não me conheço bem: não sei bem o que gosto e o que quero."],
+          ["B", "Má. Sinto-me desiludida/o e desmotivada/o."],
+          ["C", "Em descoberta, mas instável."],
+          ["D", "Boa, mas quero aprofundar e evoluir."]
+        ]
+      },
+      {
+        text: "Como queres estar daqui a 3 meses?",
+        opts: [
+          ["A", "Com menos pressão e mais espaço para respirar."],
+          ["B", "Com mais energia e equilíbrio: corpo e mente sincronizados."],
+          ["C", "Com novos hábitos e uma identidade mais alinhada com quem quero ser."],
+          ["D", "A viver de forma consistente o que já sei que funciona para mim."]
+        ]
+      }
+    ];
+
+    const QsTeam = [
+      {
+        text: "Como descreves o estado geral da tua equipa neste momento?",
+        opts: [
+          ["A", "Em modo de sobrevivência: demasiadas exigências, pouco espaço para respirar."],
+          ["B", "Baixa energia coletiva: cansaço visível e dificuldade em recuperar ritmo."],
+          ["C", "Funcional, mas com padrões e fricções que já não servem a equipa."],
+          ["D", "Relativamente estável e com vontade de consolidar o que funciona."]
+        ]
+      },
+      {
+        text: "Como é a relação da equipa com tempo, prazos e prioridades?",
+        opts: [
+          ["A", "Nunca chega. Há sempre mais para fazer do que capacidade."],
+          ["B", "Há tempo no calendário, mas a energia da equipa não acompanha."],
+          ["C", "Há espaço, mas a equipa não usa bem reuniões e foco."],
+          ["D", "A gestão é razoável, mas falta clareza e ritmo sustentável."]
+        ]
+      },
+      {
+        text: "O que pesa mais ao grupo neste momento?",
+        opts: [
+          ["A", "Excesso: tarefas, reuniões, informação, expectativas externas."],
+          ["B", "Desgaste físico e mental: pouca recuperação mesmo com pausas formais."],
+          ["C", "Padrões antigos na forma de colaborar e decidir."],
+          ["D", "Falta de consistência: boas iniciativas que não se mantêm."]
+        ]
+      },
+      {
+        text: "Como descreves o ritmo da equipa em relação ao corpo, pausas e recuperação?",
+        opts: [
+          ["A", "Muito cognitivo e pouco corpo: poucas pausas reais."],
+          ["B", "Tensão e cansaço acumulado no grupo."],
+          ["C", "Há consciência, mas hábitos de trabalho que precisam de mudar."],
+          ["D", "Já há práticas (pausas, rituais), mas falta regularidade."]
+        ]
+      },
+      {
+        text: "Como foi o bem-estar coletivo (stress, desgaste, clima) no último mês?",
+        opts: [
+          ["A", "Caótico. Pouco espaço para acompanhar pessoas e carga."],
+          ["B", "Oscilante. Bons dias misturados com sobrecarga constante."],
+          ["C", "Razoável: dá para melhorar padrões e comunicação."],
+          ["D", "Relativamente bom. O objetivo é não perder o ganho."]
+        ]
+      },
+      {
+        text: "Quando pensas em introduzir hábitos de bem-estar na equipa, o que acontece?",
+        opts: [
+          ["A", "Nem é prioridade agora: primeiro é gerir a urgência do dia a dia."],
+          ["B", "Gostávamos, mas falta energia e clareza para começar."],
+          ["C", "Tentamos iniciativas, mas os velhos hábitos de pressa voltam."],
+          ["D", "Já existem ações pontuais, mas perdem-se quando o trabalho aperta."]
+        ]
+      },
+      {
+        text: "O que a organização ou a liderança já tentou para melhorar o bem-estar da equipa?",
+        opts: [
+          ["A", "Pouco ou nada de estruturado, ou tentativas muito curtas."],
+          ["B", "Workshops de bem-estar, pausas, flexibilidade: foco em recuperar."],
+          ["C", "Novas ferramentas, processos ou rotinas de trabalho."],
+          ["D", "Programas contínuos ou acompanhamento, com resultados mistos."]
+        ]
+      },
+      {
+        text: "O que sentes que a equipa mais precisa agora?",
+        opts: [
+          ["A", "Parar e simplificar: menos ruído, menos simultâneo."],
+          ["B", "Recuperar ritmo e regular o stress coletivo."],
+          ["C", "Mudar padrões: forma de reunir, comunicar e decidir."],
+          ["D", "Manter e consolidar o que já funciona sem voltar atrás."]
+        ]
+      },
+      {
+        text: "Qual destas dinâmicas se nota mais ultimamente na equipa?",
+        opts: [
+          ["A", "Overwhelm: demasiado em simultâneo e pouca margem."],
+          ["B", "Exaustão: cansaço que o descanso de fim de semana não resolve."],
+          ["C", "Frustração: sabemos o que falta, mas não avançamos."],
+          ["D", "Impaciência: vamos bem, mas queremos consolidar mais depressa."]
+        ]
+      },
+      {
+        text: "Como está a relação da equipa consigo própria neste momento?",
+        opts: [
+          ["A", "Desligada. Pouca clareza sobre prioridades, identidade e o que nos define em conjunto."],
+          ["B", "Frágil. Desilusão e desmotivação são visíveis no grupo."],
+          ["C", "Em descoberta, mas instável."],
+          ["D", "Boa, mas há margem para aprofundar e evoluir."]
+        ]
+      },
+      {
+        text: "O que é o maior obstáculo entre a equipa e um ritmo sustentável?",
+        opts: [
+          ["A", "Excesso de prioridades e frentes abertas: não sabemos por onde começar nem o que cortar primeiro."],
+          ["B", "O estado geral do grupo: sem energia recuperada é difícil mudar processos com consistência."],
+          ["C", "Padrões antigos de cultura: sabemos o que falta mudar, mas voltamos aos mesmos hábitos."],
+          ["D", "Consistência no tempo: já mudámos coisas, mas funcionamos em campanhas e regredimos no dia a dia."]
+        ]
+      },
+      {
+        text: "Como queres que a equipa esteja daqui a 3 meses?",
+        opts: [
+          ["A", "Com menos pressão e mais espaço para trabalhar com clareza."],
+          ["B", "Com mais energia e equilíbrio: ritmo e recuperação alinhados."],
+          ["C", "Com novos hábitos de colaboração e comunicação mais saudáveis."],
+          ["D", "A consolidar de forma consistente o que já sabemos que funciona."]
+        ]
+      }
+    ];
+
+    const phasesSelf = {
+      A: {
+        code: "ELIMINAR",
+        col: "var(--ph-a)",
+        headline: "Antes de adicionar, é preciso criar espaço.",
+        body: "O teu resultado do Quiz mostra que estás numa fase de excesso: demasiada informação, demasiados compromissos, demasiada pressão. A boa notícia: não precisas de mais força de vontade. Precisas de menos ruído. A fase ELIMINAR é sobre criar espaço mental, físico e energético para que qualquer mudança possa acontecer de verdade.",
+        events: [
+          { icon: "🌿", title: "Retiro Reset ESSE MOOD", sub: "3 dias para parar o ruído, respirar fundo e voltar diferente. 22–24 maio · Caminha.", href: "/experiencias/retiro-reset-maio-2026/" },
+          { icon: "❄️", title: "Workshop Breathwork & Ice Bath", sub: "O reset mais poderoso que conheces, em 4 horas. Presencial.", href: "/experiencias/" }
+        ]
+      },
+      B: {
+        code: "SINTONIZAR",
+        col: "var(--ph-b)",
+        headline: "O teu sistema precisa de regular, não de mais esforço.",
+        body: "O teu resultado do Quiz mostra que estás numa fase de baixa energia: o corpo e a mente estão a pedir pausa, não mais ação. Mudar hábitos aqui seria construir em areia. A fase SINTONIZAR é sobre recuperação ativa: regular o sistema nervoso, voltar ao corpo e criar a base a partir da qual qualquer mudança se torna possível.",
+        events: [
+          { icon: "❄️", title: "Workshop Breathwork & Ice Bath", sub: "A ferramenta mais direta para regular o sistema nervoso. Em 4 horas.", href: "/experiencias/" },
+          { icon: "🌊", title: "Sea & Sauna", sub: "O frio que acalma. O calor que expande. A respiração que conecta.", href: "/experiencias/" }
+        ]
+      },
+      C: {
+        code: "SUBSTITUIR",
+        col: "var(--ph-c)",
+        headline: "Sabes o que queres. Agora é sobre criar os padrões certos.",
+        body: "O teu resultado do Quiz mostra que estás pronto para mudar: tens energia, tens intenção, mas os velhos padrões voltam sempre. Não é fraqueza: é neurologia. A fase SUBSTITUIR não é sobre força de vontade: é sobre redesenhar o ambiente e a identidade para que os novos comportamentos sejam o caminho de menor resistência.",
+        events: [
+          { icon: "⚡", title: "Challenge 5 Dias LIMITLESSE", sub: "5 práticas. 5 dias. Um estado diferente na sexta. Online.", href: "/experiencias/" },
+          { icon: "🔁", title: "Challenge 7 Dias LIMITLESSE", sub: "Uma semana para criar o padrão que fica. Com live diária.", href: "/experiencias/" }
+        ]
+      },
+      D: {
+        code: "ESTABELECER",
+        col: "var(--ph-d)",
+        headline: "Já tens o caminho. Agora é torná-lo permanente.",
+        body: "O teu resultado do Quiz mostra que estás numa fase de consolidação: tens o que funciona, mas a consistência ainda é o desafio. A fase ESTABELECER é sobre criar sistemas que não dependam de motivação para durar. O objetivo: viver LIMITLESSE deixe de ser uma decisão diária e passe a ser quem és.",
+        events: [
+          { icon: "🧘", title: "ESSE CLUB, Membership", sub: "Comunidade e suporte contínuo para manter o que construíste.", href: "/club/" },
+          { icon: "🏔️", title: "Retiro ESSE MOOD", sub: "Para renovar, aprofundar e sair da rotina com intenção.", href: "/experiencias/" }
+        ]
+      }
+    };
+
+    const phasesTeam = {
+      A: {
+        code: "ELIMINAR",
+        col: "var(--ph-a)",
+        headline: "Antes de acrescentar iniciativas, a equipa precisa de espaço.",
+        body: "O resultado deste Quiz para a tua equipa aponta para uma fase de excesso: demasiadas prioridades, reuniões e pressão simultânea. A boa notícia: não falta boa vontade. Falta menos ruído. A fase ELIMINAR em contexto de equipa é sobre cortar o supérfluo, clarificar o essencial e criar margem para que qualquer programa de bem-estar possa pegar de verdade.",
+        events: [
+          { icon: "🏢", title: "Programas ESSE MOOD para empresas", sub: "Diagnóstico e plano modular para reduzir sobrecarga e alinhar ritmo.", href: "/empresas/" },
+          { icon: "🌿", title: "Retiro Reset ESSE MOOD", sub: "Também em formato equipa ou grupo restrito sob consulta. Ver disponibilidade.", href: "/experiencias/retiro-reset-maio-2026/" }
+        ]
+      },
+      B: {
+        code: "SINTONIZAR",
+        col: "var(--ph-b)",
+        headline: "A equipa precisa de regular o sistema, não de mais metas.",
+        body: "O resultado deste Quiz indica uma fase de desgaste coletivo: o grupo precisa de recuperação e regulação antes de mudar processos à pressa. A fase SINTONIZAR em equipa é sobre ritmos de trabalho, pausas que contam e práticas que baixam o stress de forma visível, para depois construir em cima de uma base estável.",
+        events: [
+          { icon: "🏢", title: "Workshop breathwork e regulação para equipas", sub: "Sessões presenciais ou programa sob medida. Ver programas para empresas.", href: "/empresas/" },
+          { icon: "❄️", title: "Workshop Breathwork & Ice Bath", sub: "Experiência intensa para reset do sistema nervoso. Em grupo.", href: "/experiencias/" }
+        ]
+      },
+      C: {
+        code: "SUBSTITUIR",
+        col: "var(--ph-c)",
+        headline: "Há energia para mudar. Falta tornar os novos hábitos o caminho fácil.",
+        body: "O resultado deste Quiz mostra que a equipa está pronta para trocar padrões: reuniões, comunicação, forma de decidir. A fase SUBSTITUIR não é motivação em excesso: é redesenhar rituais e regras de trabalho para que o comportamento desejado seja o mais simples no dia a dia.",
+        events: [
+          { icon: "🏢", title: "Programa LIMITLESSE para organizações", sub: "Módulos para substituir hábitos de pressa por ritmos sustentáveis.", href: "/empresas/" },
+          { icon: "⚡", title: "Challenge 5 Dias LIMITLESSE", sub: "Pode servir como piloto com uma equipa piloto antes de escalar.", href: "/experiencias/" }
+        ]
+      },
+      D: {
+        code: "ESTABELECER",
+        col: "var(--ph-d)",
+        headline: "Já há práticas que funcionam. O desafio é não as perder quando a carga sobe.",
+        body: "O resultado deste Quiz aponta para uma fase de consolidação: a equipa sabe o que resulta, mas precisa de sistemas e rituais que não dependam de campanhas pontuais. A fase ESTABELECER é sobre tornar o bem-estar e o bom trabalho parte da cultura, não um extra quando sobra tempo.",
+        events: [
+          { icon: "🏢", title: "Acompanhamento contínuo para equipas", sub: "Formato recorrente para manter clima e hábitos ao longo do ano.", href: "/empresas/" },
+          { icon: "🌿", title: "Experiências ESSE MOOD", sub: "Retiros e eventos para renovar e alinhar a equipa fora do escritório.", href: "/experiencias/" }
+        ]
+      }
+    };
+
+    const N = 12;
+
+    /**
+     * Pontuação por solução (por trás de cada resposta A/B/C/D).
+     * Cada pergunta [0..11] tem um mapa: a letra escolhida soma pontos às chaves indicadas.
+     * Pergunta 1 (estado atual): A Mentoria, B Retiros, C Workshops+Produtos, D Challenges+Produtos.
+     * As entradas 1..11 repetem o mesmo template até personalizares por pergunta.
+     */
+    const SOLUTION_KEYS = ["mentoria", "retiros", "workshops", "produtos", "challenges"];
+    const solutionLabels = {
+      mentoria: "Mentoria LIMITLESSE",
+      retiros: "Retiros",
+      workshops: "Workshops",
+      produtos: "Produtos",
+      challenges: "Challenges"
+    };
+    const solutionMapQ1 = {
+      A: { mentoria: 1 },
+      B: { retiros: 1 },
+      C: { workshops: 1, produtos: 1 },
+      D: { challenges: 1, produtos: 1 }
+    };
+    const defaultSolutionRow = {
+      A: { mentoria: 1 },
+      B: { retiros: 1 },
+      C: { workshops: 1, produtos: 1 },
+      D: { challenges: 1, produtos: 1 }
+    };
+    /** Pergunta 7 (índice 6): 17 opções A-Q, multi (sem antiga opção «sozinho/a»). */
+    const solutionMapTentaste6 = {
+      A: { mentoria: 1 },
+      B: { challenges: 1, produtos: 1 },
+      C: { workshops: 1 },
+      D: { workshops: 1 },
+      E: { challenges: 1 },
+      F: { retiros: 1, workshops: 1 },
+      G: { workshops: 1 },
+      H: { workshops: 1 },
+      I: { workshops: 1 },
+      J: { workshops: 1 },
+      K: { challenges: 1, produtos: 1 },
+      L: { mentoria: 1, produtos: 1 },
+      M: { mentoria: 1 },
+      N: { workshops: 1, challenges: 1 },
+      O: { produtos: 1, challenges: 1 },
+      P: { produtos: 1 },
+      Q: { mentoria: 1 }
+    };
+    const solutionScoreMapsSelf = Array.from({ length: 12 }, (_, i) => {
+      if (i === 0) return JSON.parse(JSON.stringify(solutionMapQ1));
+      if (i === 6) return JSON.parse(JSON.stringify(solutionMapTentaste6));
+      return JSON.parse(JSON.stringify(defaultSolutionRow));
+    });
+    const solutionScoreMapsTeam = Array.from({ length: 12 }, (_, i) => {
+      if (i === 0) return JSON.parse(JSON.stringify(solutionMapQ1));
+      return JSON.parse(JSON.stringify(defaultSolutionRow));
+    });
+
+    const st = { step: -2, segment: null, ans: Array(N).fill(null), email: "", tentasteNote: "" };
+
+    function currentQs() { return st.segment === "team" ? QsTeam : QsSelf; }
+    function currentPhases() { return st.segment === "team" ? phasesTeam : phasesSelf; }
+    function currentSolutionMaps() { return st.segment === "team" ? solutionScoreMapsTeam : solutionScoreMapsSelf; }
+
+    function eachAnswerLetter(i, fn) {
+      const v = st.ans[i];
+      if (v == null) return;
+      if (Array.isArray(v)) {
+        v.forEach(letter => fn(letter));
+      } else {
+        fn(v);
+      }
+    }
+
+    function tallySolutionScores() {
+      const maps = currentSolutionMaps();
+      const totals = { mentoria: 0, retiros: 0, workshops: 0, produtos: 0, challenges: 0 };
+      for (let i = 0; i < N; i++) {
+        const row = maps[i];
+        if (!row) continue;
+        eachAnswerLetter(i, letter => {
+          if (!letter || !row[letter]) return;
+          const delta = row[letter];
+          Object.keys(delta).forEach(k => { totals[k] = (totals[k] || 0) + delta[k]; });
+        });
+      }
+      return totals;
+    }
+
+    function rankedSolutions(totals) {
+      return SOLUTION_KEYS.map(k => ({ key: k, label: solutionLabels[k], score: totals[k] || 0 }))
+        .sort((a, b) => b.score - a.score);
+    }
+
+    const $ = id => document.getElementById(id);
+
+    function pct() {
+      if (st.step < 0) return 0;
+      if (st.step >= N) return 100;
+      return Math.round(((st.step + 1) / N) * 100);
+    }
+
+    /**
+     * Pergunta 7 (índice 6), opções A-Q: converte para contagem de fase LIMITLESSE (A-D).
+     */
+    function phaseLetterForScore(qi, letter) {
+      if (qi !== 6 || !letter) return letter;
+      const p6 = {
+        A: "A",
+        B: "C", C: "B", D: "B", E: "C",
+        F: "B", G: "B", H: "B",
+        I: "B", J: "B",
+        K: "C",
+        L: "D", M: "D",
+        N: "C",
+        O: "C", P: "C",
+        Q: "C"
+      };
+      return p6[letter] !== undefined ? p6[letter] : letter;
+    }
+
+    function score() {
+      const c = { A: 0, B: 0, C: 0, D: 0 };
+      st.ans.forEach((v, i) => {
+        if (v == null) return;
+        const letters = Array.isArray(v) ? v : [v];
+        letters.forEach(letter => {
+          const L = phaseLetterForScore(i, letter);
+          if (L && c[L] !== undefined) c[L]++;
+        });
+      });
+      const sorted = Object.entries(c).sort((a, b) => b[1] - a[1]);
+      return { counts: c, phase: sorted[0][0], tie: sorted[0][1] === sorted[1][1], second: sorted[1][0] };
+    }
+
+    function render() {
+      $("bar").style.width = pct() + "%";
+      const wrap = $("screen");
+      wrap.className = "";
+      void wrap.offsetWidth;
+      wrap.className = "screen";
+
+      if (st.step === -2) segment(wrap);
+      else if (st.step === -1) intro(wrap);
+      else if (st.step < N) quest(wrap, st.step);
+      else if (st.step === N) calc(wrap);
+      else if (st.step === N + 1) emailGate(wrap);
+      else result(wrap);
+    }
+
+    function segment(w) {
+      $("lbl").textContent = "Quiz LIMITLESSE";
+      $("cnt").textContent = "";
+      w.innerHTML = `
+        <span class="eyebrow">Antes de começar</span>
+        <p class="seg-q">Este Quiz é para quem?</p>
+        <div class="seg-opts">
+          <button type="button" class="seg-opt" id="seg-self">Para mim<span class="seg-opt-sub">Resultado e percurso personalizado para ti</span></button>
+          <button type="button" class="seg-opt" id="seg-team">Para uma empresa/equipa<span class="seg-opt-sub">Resultado e solução adaptada às vossas necessidades</span></button>
+        </div>
+      `;
+      $("seg-self").onclick = () => {
+        st.segment = "self";
+        st.ans = Array(N).fill(null);
+        st.email = "";
+        st.tentasteNote = "";
+        st.step = -1;
+        render();
+      };
+      $("seg-team").onclick = () => {
+        st.segment = "team";
+        st.ans = Array(N).fill(null);
+        st.email = "";
+        st.tentasteNote = "";
+        st.step = -1;
+        render();
+      };
+    }
+
+    function intro(w) {
+      const team = st.segment === "team";
+      $("lbl").textContent = "Quiz LIMITLESSE";
+      $("cnt").textContent = "8 minutos";
+      const eyebrow = team ? "Percurso da equipa · Gratuito" : "Percurso à tua medida · Gratuito";
+      const h1 = team
+        ? `<h1 class="intro-h">Qual a melhor solução <em>para a tua equipa?</em></h1>`
+        : `<h1 class="intro-h">Qual a melhor solução<br><em>para ti?</em></h1>`;
+      const value = team
+        ? `Ao final deste Quiz recebes uma leitura da fase LIMITLESSE da equipa e sugestões de processo e de programas alinhados com o que o grupo sente, precisa e procura neste momento.`
+        : `Ao final deste Quiz recebes um resultado claro, uma leitura da tua fase LIMITLESSE e sugestões de processo e de próximos passos personalizados para aquilo que sentes, precisas e procuras agora.`;
+      const p = team
+        ? `Não há respostas certas ou erradas.<br>Cada escolha adapta o percurso ao contexto da equipa: menos genérico, mais útil para o vosso momento.<br><br>São 12 perguntas. No fim, vês em que fase coletiva estão (ELIMINAR, SINTONIZAR, SUBSTITUIR ou ESTABELECER) e que programas ou experiências fazem mais sentido para a organização.`
+        : `Não há respostas certas ou erradas.<br>Cada escolha ajuda-nos a adaptar o percurso a ti: menos genérico, mais útil para o teu momento.<br><br>São 12 perguntas. No fim, vês onde estás no sistema (ELIMINAR, SINTONIZAR, SUBSTITUIR ou ESTABELECER) e que experiências fazem mais sentido contigo.`;
+      const bullets = team
+        ? `<div class="bullets">
+          <div class="bullet"><span class="bullet-dot">◆</span><span>Percebes o padrão que atravessa a equipa, sem julgamento</span></div>
+          <div class="bullet"><span class="bullet-dot">◆</span><span>Vês a fase coletiva atual e o que ela implica em prioridade</span></div>
+          <div class="bullet"><span class="bullet-dot">◆</span><span>Recebes sugestões de processo e de programas alinhados com o vosso momento</span></div>
+          <div class="bullet"><span class="bullet-dot">◆</span><span>Gratuito. Sem cartão. Sem compromisso.</span></div>
+        </div>`
+        : `<div class="bullets">
+          <div class="bullet"><span class="bullet-dot">◆</span><span>Percebes o padrão que te tem travado, sem julgamento</span></div>
+          <div class="bullet"><span class="bullet-dot">◆</span><span>Vês a tua fase atual e o que ela implica em termos de prioridade</span></div>
+          <div class="bullet"><span class="bullet-dot">◆</span><span>Recebes sugestões de processo e de experiências alinhadas com o teu momento</span></div>
+          <div class="bullet"><span class="bullet-dot">◆</span><span>Gratuito. Sem cartão. Sem compromisso.</span></div>
+        </div>`;
+      w.innerHTML = `
+        <span class="eyebrow">${eyebrow}</span>
+        ${h1}
+        <p class="intro-value">${value}</p>
+        <p class="intro-p">${p}</p>
+        ${bullets}
+        <div class="actions">
+          <button class="btn btn-g" id="backseg">← Voltar</button>
+          <button class="btn btn-p" id="s0">Começar o Quiz →</button>
+        </div>
+      `;
+      $("backseg").onclick = () => { st.step = -2; st.segment = null; st.tentasteNote = ""; render(); };
+      $("s0").onclick = () => { st.step = 0; render(); };
+    }
+
+    function quest(w, i) {
+      const Q = currentQs();
+      const q = Q[i];
+      let sel = st.ans[i];
+      if (!Array.isArray(sel)) sel = sel ? [sel] : [];
+      st.ans[i] = sel;
+      const hasAnswer = sel.length > 0;
+
+      $("lbl").textContent = `Pergunta ${i + 1} de ${N}`;
+      $("cnt").textContent = "Várias opções";
+      const hint = `<p class="q-hint">Podes selecionar mais do que uma opção.</p>`;
+      const isTentasteQ = i === 6 && st.segment === "self";
+      const tentasteExtra = isTentasteQ
+          ? `
+        <div class="free-text-wrap">
+          <label class="free-text-label" for="tentaste-note">Queres acrescentar algo? (opcional)</label>
+          <textarea id="tentaste-note" class="free-text-area" rows="4" maxlength="2000" placeholder="Escreve aqui o que quiseres partilhar sobre o que já tentaste."></textarea>
+        </div>`
+          : "";
+      w.innerHTML = `
+        <h2 class="q-h">${q.text}</h2>
+        ${hint}
+        <div class="opts opts-multi">
+          ${q.opts.map(([k, t]) => {
+            const on = sel.includes(k);
+            return `
+            <div class="opt${on ? " sel" : ""}" data-k="${k}" role="checkbox" aria-checked="${on}">
+              <span class="opt-k">${k}</span>
+              <span>${t}</span>
+            </div>`;
+          }).join("")}
+        </div>
+        ${tentasteExtra}
+        <div class="actions">
+          <button class="btn btn-g" id="bk">← Voltar</button>
+          <button class="btn btn-p" id="nx" ${hasAnswer ? "" : "disabled"}>Continuar →</button>
+        </div>
+      `;
+      w.querySelectorAll(".opt").forEach(el => {
+        el.onclick = () => {
+          const k = el.dataset.k;
+          const cur = [...(st.ans[i] || [])];
+          const pos = cur.indexOf(k);
+          if (pos >= 0) cur.splice(pos, 1);
+          else cur.push(k);
+          cur.sort();
+          st.ans[i] = cur;
+          render();
+        };
+      });
+      $("bk").onclick = () => {
+        if (i > 0) st.step--;
+        else st.step = -1;
+        render();
+      };
+      $("nx").onclick = () => { if (hasAnswer) { st.step++; render(); } };
+      const ta = $("tentaste-note");
+      if (ta) {
+        ta.value = st.tentasteNote || "";
+        ta.addEventListener("input", () => { st.tentasteNote = ta.value; });
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function calc(w) {
+      const team = st.segment === "team";
+      $("lbl").textContent = team ? "A preparar o resultado da equipa…" : "A preparar o teu resultado…";
+      $("cnt").textContent = "";
+      $("bar").style.width = "100%";
+      const h = team ? "A preparar o resultado da equipa…" : "A preparar o teu resultado…";
+      const s = team
+        ? "A cruzar as respostas com o percurso sugerido para o contexto da equipa."
+        : "A cruzar as tuas respostas com o teu percurso personalizado.";
+      w.innerHTML = `
+        <div class="calc">
+          <div class="spin"></div>
+          <h2 class="calc-h">${h}</h2>
+          <p class="calc-s">${s}</p>
+        </div>
+      `;
+      setTimeout(() => { st.step = N + 1; render(); }, 2000);
+    }
+
+    function emailGate(w) {
+      const team = st.segment === "team";
+      $("lbl").textContent = team ? "A tua recomendação" : "A tua recomendação";
+      $("cnt").textContent = "";
+      $("bar").style.width = "100%";
+
+      const totals = tallySolutionScores();
+      const ranked = rankedSolutions(totals);
+      const top = ranked.filter(x => x.score > 0);
+      const listHtml = top.length
+        ? top.map((x, idx) => `
+            <div class="rank-row">
+              <span class="rank-name">${idx + 1}. ${x.label}</span>
+              <span class="rank-pts">${x.score} pt${x.score === 1 ? "" : "s"}</span>
+            </div>`).join("")
+        : `<p class="email-lead">Com as tuas respostas, volta ao Quiz ou contacta a ESSE MOOD para um plano à medida.</p>`;
+
+      const head = team
+        ? "Com base nas respostas sobre a vossa organização, estas são as áreas que mais se destacam para o próximo passo."
+        : "Com base nas tuas respostas, estas são as soluções que mais se adequam ao teu momento (somatório das tuas escolhas em todas as perguntas).";
+      const noteBlock =
+        !team && (st.tentasteNote || "").trim()
+          ? `<p class="email-lead" style="margin-top:4px;padding:12px 14px;background:var(--surface-2);border-radius:var(--r-sm);border:1px solid var(--line);"><strong>O que acrescentaste sobre o que já tentaste:</strong><br>${escapeHtml(st.tentasteNote.trim()).replace(/\n/g, "<br>")}</p>`
+          : "";
+
+      w.innerHTML = `
+        <span class="eyebrow">Recomendação por solução</span>
+        <h2 class="res-h" style="margin-bottom:12px;">Onde fazes mais sentido agora</h2>
+        <p class="email-lead">${head}</p>
+        ${noteBlock}
+        <div class="rank-list">${listHtml}</div>
+        <p class="section-label" style="margin-bottom:10px;">Recebe o resumo por email</p>
+        <input type="email" class="email-field" id="em-inp" placeholder="o teu@email.com" autocomplete="email">
+        <p class="email-hint">Usamos o email apenas para te enviar o resumo deste Quiz. Depois vês o resultado completo com a fase LIMITLESSE.</p>
+        <div class="actions">
+          <button type="button" class="btn btn-p" id="em-go">Ver resultado completo →</button>
+        </div>
+      `;
+      const inp = $("em-inp");
+      if (st.email) inp.value = st.email;
+      $("em-go").onclick = () => {
+        const v = (inp.value || "").trim();
+        st.email = v;
+        if (!v || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+          inp.focus();
+          inp.style.borderColor = "var(--ph-a)";
+          return;
+        }
+        inp.style.borderColor = "";
+        st.step = N + 2;
+        render();
+      };
+    }
+
+    function result(w) {
+      const r = score();
+      const ph = currentPhases()[r.phase];
+      const team = st.segment === "team";
+      const totals = tallySolutionScores();
+      const ranked = rankedSolutions(totals).filter(x => x.score > 0);
+      const topSol = ranked[0];
+      const solRecap = topSol
+        ? `<p class="res-body" style="margin-bottom:20px;padding:14px 16px;background:var(--surface-2);border-radius:var(--r-sm);border:1px solid var(--line);"><strong>Solução em destaque:</strong> ${topSol.label}${ranked[1] ? ` · seguida de ${ranked[1].label}` : ""}.</p>`
+        : "";
+      const tentasteBlock =
+        !team && (st.tentasteNote || "").trim()
+          ? `<p class="res-body" style="margin-bottom:18px;padding:14px 16px;background:var(--surface-2);border-radius:var(--r-sm);border:1px solid var(--line);"><strong>O que partilhaste sobre o que já tentaste:</strong><br>${escapeHtml(st.tentasteNote.trim()).replace(/\n/g, "<br>")}</p>`
+          : "";
+
+      $("lbl").textContent = team ? "Resultado da equipa" : "O teu resultado";
+      $("cnt").textContent = "";
+
+      const secLabel = team
+        ? "Programas e experiências recomendados para esta fase"
+        : "Experiências recomendadas para a tua fase";
+      const actions = team
+        ? `<div class="actions" style="margin-top:22px;">
+          <a class="btn btn-p" href="/empresas/" style="text-decoration:none;display:inline-block;">Programas para empresas →</a>
+          <a class="btn btn-g" href="/experiencias/" style="text-decoration:none;display:inline-block;">Ver experiências →</a>
+        </div>`
+        : `<div class="actions" style="margin-top:22px;">
+          <a class="btn btn-p" href="/experiencias/" style="text-decoration:none;display:inline-block;">Ver todos os eventos →</a>
+          <a class="btn btn-g" href="/club/" style="text-decoration:none;display:inline-block;">Conhecer o ESSE Club</a>
+        </div>`;
+
+      w.innerHTML = `
+        <span class="eyebrow">Quiz LIMITLESSE · Fase atual${team ? " (equipa)" : ""}</span>
+        ${solRecap}
+        ${tentasteBlock}
+        <div class="phase-pill" style="background:${ph.col}1a;color:${ph.col};border:1px solid ${ph.col}44;">
+          <span>●</span>${ph.code}
+        </div>
+        <h2 class="res-h">${ph.headline}</h2>
+        <p class="res-body">${ph.body}</p>
+        <hr class="divider">
+        <span class="section-label">${secLabel}</span>
+        <div class="event-cards">
+          ${ph.events.map(ev => `
+            <a class="ev-card" href="${ev.href}">
+              <span class="ev-icon">${ev.icon}</span>
+              <span>
+                <div class="ev-title">${ev.title}</div>
+                <div class="ev-sub">${ev.sub}</div>
+              </span>
+              <span class="ev-arrow">→</span>
+            </a>
+          `).join("")}
+        </div>
+        ${actions}
+        <p class="score-note">Contagem fase (A·D): ${r.counts.A} · ${r.counts.B} · ${r.counts.C} · ${r.counts.D} &nbsp;|&nbsp; Pontos por solução: ${SOLUTION_KEYS.map(k => `${solutionLabels[k]} ${totals[k]}`).join(" · ")}</p>
+        <button class="btn-link" id="restart">Refazer o Quiz</button>
+      `;
+      $("restart").onclick = () => { st.step = -2; st.segment = null; st.ans = Array(N).fill(null); st.email = ""; st.tentasteNote = ""; render(); };
+    }
+
+    render();
+  </script>
+</body>
+</html>
