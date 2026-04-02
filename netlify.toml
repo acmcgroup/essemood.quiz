@@ -1,0 +1,5 @@
+# Raiz do site = quiz (index.html). Redireciona URL antiga partilhada.
+[[redirects]]
+  from = "/wizard-visual.html"
+  to = "/"
+  status = 301
